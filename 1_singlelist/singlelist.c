@@ -11,7 +11,7 @@
 
 typedef struct Node_t{
     int val;
-	struct Node_t *next;
+    struct Node_t *next;
 }Node;
 
 typedef struct {
@@ -21,9 +21,9 @@ typedef struct {
 void list_show(List *list)
 {
     if(list == NULL) {
-		printf("The list is NULL\n");
+        printf("The list is NULL\n");
         return;
-	}
+    }
 
     Node *cur = list->head;
 	while(cur) {
@@ -51,15 +51,15 @@ void list_destroy_by_level2_pointer(List **list)
         while(cur)
         {
             p = cur->next;
-            node_free(&cur); /* �ͷ���������Ա,��û�н�����ΪNULL,ֻ�ǽ�cur��ΪNULL */
+            node_free(&cur); /* 释放了链表成员,但没有将其置为NULL,只是将cur置为NULL */
     		cur = p;
     	}
-		list_show(*list);    /* ��ʱ����������Ա����ʵ����ֵ */
+		list_show(*list);    /* 此时访问链表成员会访问到随机值 */
 		free(*list);
 		*list = NULL;
     }
 }
-#else /* �Ľ� */
+#else /* 改进 */
 void node_free_by_level2_pointer(Node **node)
 {
     if(node!=NULL && *node!=NULL) {
@@ -89,8 +89,8 @@ void node_free_by_level1_pointer(Node *node)
 {
     if(node!= NULL) {
         free(node);
-/* �˴��ͷ��ڴ�,��node��ֵ����,û�ܽ�node��ΪNULL,�ⲿ���ܹ����ʵ����ͷ��ڴ�������ֵ */
-	    node = NULL;  /* node�ֲ�����,���������ⲿ��ر���ΪNULL */
+/* 此处释放内存,但node是值传递,没能将node置为NULL,外部还能够访问到该释放内存里的随机值 */
+	    node = NULL;  /* node局部变量,并不会置外部相关变量为NULL */
     }
 }
 void list_destroy_by_level1_pointer(List *list)
@@ -101,27 +101,27 @@ void list_destroy_by_level1_pointer(List *list)
         while(cur)
         {
             p = cur->next;
-            node_free(cur); /* �ͷ���������Ա,��û�н�����ΪNULL */
+            node_free(cur); /* 释放了链表成员,但没有将其置为NULL */
     		cur = p;
     	}
-		list_show(list);    /* ��ʱ����������Ա����ʵ����ֵ */
+		list_show(list);    /* 此时访问链表成员会访问到随机值 */
 
-#if 0  /* �˴��ܹ��ͷ��ڴ�,��list��ֵ����,��listΪNULL��,ִ����ú����������listֵ������ı�,���ܻᵼ�¶����ͷ��ڴ���� */
+#if 0  /* 此处能够释放内存,但list是值传递,置list为NULL后,执行完该函数后函数外的list值并不会改变,可能会导致二次释放内存出错 */
 		if(list!=NULL) {
 			printf("[%s:%d]: list %p\n",__func__,__LINE__,list);
     		free(list);
-    		list = NULL; /* list�ֲ�����,���������ⲿ��ر���ΪNULL */
+    		list = NULL; /* list局部变量,并不会置外部相关变量为NULL */
 	    }
 #endif
     }	
 }
-#else /* �Ľ� */
+#else /* 改进 */
 void node_free_by_level1_pointer(Node *node)
 {
     if(node!= NULL) {
         free(node);
-/* �˴��ͷ��ڴ�,��node��ֵ����,û�ܽ�node��ΪNULL,�ⲿ���ܹ����ʵ����ͷ��ڴ�������ֵ */
-	    node = NULL;  /* node�ֲ�����,���������ⲿ��ر���ΪNULL */
+/* 此处释放内存,但node是值传递,没能将node置为NULL,外部还能够访问到该释放内存里的随机值 */
+	    node = NULL;  /* node局部变量,并不会置外部相关变量为NULL */
     }
 }
 void list_destroy_by_level1_pointer(List *list)
@@ -132,16 +132,16 @@ void list_destroy_by_level1_pointer(List *list)
         while(cur)
         {
             cur = cur->next;
-            node_free_by_level1_pointer(list->head); /* �ͷ���������Ա,��û�н�����ΪNULL */
-    		list->head = cur;      /* ���մ˴���head��ΪNULL */
+            node_free_by_level1_pointer(list->head); /* 释放了链表成员,但没有将其置为NULL */
+    		list->head = cur;      /* 最终此处将head置为NULL */
     	}
-		list_show(list);    /* ��ʱ����������Ա������ʵ����ֵ */
+		list_show(list);    /* 此时访问链表成员不会访问到随机值 */
 
-#if 0  /* �˴��ܹ��ͷ��ڴ�,��list��ֵ����,��listΪNULL��,ִ����ú����������listֵ������ı�,����������ͨ��list����(�����ʵ��ڴ������ֵ��Ƿ�����),���ܻᵼ�¶����ͷ��ڴ����. */
+#if 0  /* 此处能够释放内存,但list是值传递,置list为NULL后,执行完该函数后函数外的list值并不会改变,函数外仍能通过list访问(但访问的内存是随机值或非法访问),可能会导致二次释放内存出错. */
 		if(list!=NULL) {
 			printf("[%s:%d]: list %p\n",__func__,__LINE__,list);
     		free(list);
-    		list = NULL; /* list�ֲ�����,���������ⲿ��ر���ΪNULL */
+    		list = NULL; /* list局部变量,并不会置外部相关变量为NULL */
 	    }
 #endif
     }	

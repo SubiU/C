@@ -27,10 +27,10 @@ void list_show(List *list)
 
     Node *cur = list->head;
 	while(cur) {
-        printf("%d(%p) ",cur->val,cur);
-		cur = cur->next;
+            printf("%d(%p) ",cur->val,cur);
+	    cur = cur->next;
 	}
-
+	
 	printf("\n\n");
 }
 
@@ -40,7 +40,7 @@ void node_free_by_level2_pointer(Node **node)
 {
     if(node!=NULL && *node!=NULL) {
         free(*node);
-	    *node = NULL;
+	*node = NULL;
     }
 }
 void list_destroy_by_level2_pointer(List **list)
@@ -52,11 +52,11 @@ void list_destroy_by_level2_pointer(List **list)
         {
             p = cur->next;
             node_free(&cur); /* 释放了链表成员,但没有将其置为NULL,只是将cur置为NULL */
-    		cur = p;
+    	    cur = p;
     	}
-		list_show(*list);    /* 此时访问链表成员会访问到随机值 */
-		free(*list);
-		*list = NULL;
+	list_show(*list);    /* 此时访问链表成员会访问到随机值 */
+	free(*list);
+	*list = NULL;
     }
 }
 #else /* 改进 */
@@ -64,7 +64,7 @@ void node_free_by_level2_pointer(Node **node)
 {
     if(node!=NULL && *node!=NULL) {
         free(*node);
-	    *node = NULL;
+	*node = NULL;
     }
 }
 void list_destroy_by_level2_pointer(List **list)
@@ -76,10 +76,10 @@ void list_destroy_by_level2_pointer(List **list)
         {
             cur = cur->next;
             node_free_by_level2_pointer(&((*list)->head));
-    		(*list)->head = cur;
+    	    (*list)->head = cur;
     	}
-		free(*list);
-		*list = NULL;
+	free(*list);
+	*list = NULL;
     }  
 }
 #endif
@@ -90,7 +90,7 @@ void node_free_by_level1_pointer(Node *node)
     if(node!= NULL) {
         free(node);
 /* 此处释放内存,但node是值传递,没能将node置为NULL,外部还能够访问到该释放内存里的随机值 */
-	    node = NULL;  /* node局部变量,并不会置外部相关变量为NULL */
+	node = NULL;  /* node局部变量,并不会置外部相关变量为NULL */
     }
 }
 void list_destroy_by_level1_pointer(List *list)
@@ -102,13 +102,13 @@ void list_destroy_by_level1_pointer(List *list)
         {
             p = cur->next;
             node_free(cur); /* 释放了链表成员,但没有将其置为NULL */
-    		cur = p;
+    	    cur = p;
     	}
-		list_show(list);    /* 此时访问链表成员会访问到随机值 */
+	list_show(list);    /* 此时访问链表成员会访问到随机值 */
 
 #if 0  /* 此处能够释放内存,但list是值传递,置list为NULL后,执行完该函数后函数外的list值并不会改变,可能会导致二次释放内存出错 */
 		if(list!=NULL) {
-			printf("[%s:%d]: list %p\n",__func__,__LINE__,list);
+		printf("[%s:%d]: list %p\n",__func__,__LINE__,list);
     		free(list);
     		list = NULL; /* list局部变量,并不会置外部相关变量为NULL */
 	    }
@@ -121,7 +121,7 @@ void node_free_by_level1_pointer(Node *node)
     if(node!= NULL) {
         free(node);
 /* 此处释放内存,但node是值传递,没能将node置为NULL,外部还能够访问到该释放内存里的随机值 */
-	    node = NULL;  /* node局部变量,并不会置外部相关变量为NULL */
+	node = NULL;  /* node局部变量,并不会置外部相关变量为NULL */
     }
 }
 void list_destroy_by_level1_pointer(List *list)
@@ -133,15 +133,15 @@ void list_destroy_by_level1_pointer(List *list)
         {
             cur = cur->next;
             node_free_by_level1_pointer(list->head); /* 释放了链表成员,但没有将其置为NULL */
-    		list->head = cur;      /* 最终此处将head置为NULL */
+    	    list->head = cur;      /* 最终此处将head置为NULL */
     	}
-		list_show(list);    /* 此时访问链表成员不会访问到随机值 */
+	list_show(list);    /* 此时访问链表成员不会访问到随机值 */
 
 #if 0  /* 此处能够释放内存,但list是值传递,置list为NULL后,执行完该函数后函数外的list值并不会改变,函数外仍能通过list访问(但访问的内存是随机值或非法访问),可能会导致二次释放内存出错. */
 		if(list!=NULL) {
-			printf("[%s:%d]: list %p\n",__func__,__LINE__,list);
-    		free(list);
-    		list = NULL; /* list局部变量,并不会置外部相关变量为NULL */
+		    printf("[%s:%d]: list %p\n",__func__,__LINE__,list);
+    		    free(list);
+    		    list = NULL; /* list局部变量,并不会置外部相关变量为NULL */
 	    }
 #endif
     }	
@@ -152,23 +152,23 @@ void list_destroy_by_level1_pointer(List *list)
 List *list_create(void)
 {
     List *list = NULL;
-	list = (List *)malloc(sizeof(List));	
-	if(list)
+    list = (List *)malloc(sizeof(List));	
+    if(list)
         memset(list, 0, sizeof(List));
 	
-	return list;
+    return list;
 }
 
 Node *node_create(int val)
 {
     Node *node = NULL;
-	node = (Node *)malloc(sizeof(Node));
-	if(node) {
+    node = (Node *)malloc(sizeof(Node));
+    if(node) {
         node->val = val;
-	    node->next = NULL;
+	node->next = NULL;
     }
 	
-	return node;
+    return node;
 }
 
 void list_head_add(List *list, int val)
@@ -176,144 +176,144 @@ void list_head_add(List *list, int val)
     Node *head = NULL;
 	
     if(list==NULL)
-		return;
+        return;
 
-	head = node_create(val);
-	if(head==NULL)
-		return;
-    	
-	head->next = list->head;
-	list->head = head;
+    head = node_create(val);
+    if(head==NULL)
+        return;
+
+    head->next = list->head;
+    list->head = head;
 }
 
 void list_tail_add(List *list, int val)
 {
     Node *tail = NULL;
-	Node *pre = list->head;
-	Node *cur = list->head;
+    Node *pre = list->head;
+    Node *cur = list->head;
 	
     if(list==NULL)
-		return;
+        return;
 
-	tail = node_create(val);
-	if(tail==NULL)
-		return;
+    tail = node_create(val);
+    if(tail==NULL)
+	return;
 
     while(cur) {
         pre = cur;
-		cur = cur->next;
-	}
+	cur = cur->next;
+    }
     
-	if(pre)
-		pre->next = tail;
-	else
-		list->head = tail;
+    if(pre)
+        pre->next = tail;
+    else
+        list->head = tail;
 }
 
 short list_index_add(List *list, int index, int val)
 {
     Node *node = NULL;
-	Node *pre = NULL;
-	Node *cur = list->head;
-	int count = 0;
+    Node *pre = NULL;
+    Node *cur = list->head;
+    int count = 0;
 	
     if(list==NULL)
-		return -1;
+        return -1;
 
     if(index == 0) {
         list_head_add(list, val);
-		return 0;
-	}
+	return 0;
+     }
 			
     while(cur) {
-		if(index == count) {
-			node = node_create(val);
-			if(node==NULL)
-				return -1;
-			node->next = cur;
-			pre->next = node;
-			return 0;
-		}
+	if(index == count) {
+	    node = node_create(val);
+	    if(node==NULL)
+		return -1;
+	    node->next = cur;
+	    pre->next = node;
+	    return 0;
+	}
         pre = cur;
-		cur = cur->next;
-		count++;
-	}
+	cur = cur->next;
+	count++;
+    }
 
-	if(count+1 == index) {
-		list_tail_add(list, val);
+    if(count+1 == index) {
+        list_tail_add(list, val);
         return 0;
-	}
+    }
     else {
-		printf("list_index_add failed\n");
+	printf("list_index_add failed\n");
         return -1;
     }
 }
 
 void list_index_del(List *list, int index)
 {
-	Node *node = NULL;
-	Node *pre = NULL;
-	Node *cur = NULL;
-	int count = 0;
-	
-	if(list==NULL)
-		return;
+    Node *node = NULL;
+    Node *pre = NULL;
+    Node *cur = NULL;
+    int count = 0;
+
+    if(list==NULL)
+       return;
 
     cur = list->head;	
-	if(index == 0) {
-		list->head = list->head->next; 
-		node_free_by_level1_pointer(cur);
-		return;
-	}
+    if(index == 0) {
+        list->head = list->head->next; 
+        node_free_by_level1_pointer(cur);
+        return;
+    }
 			
-	while(cur) {
-		if(index == count) {
+    while(cur) {
+	if(index == count) {
             pre->next = cur->next;
-		    node_free_by_level1_pointer(cur);
-			return;
-		}
-		pre = cur;
-		cur = cur->next;
-		count++;
+	    node_free_by_level1_pointer(cur);
+	    return;
 	}
+	pre = cur;
+	cur = cur->next;
+	count++;
+    }
 
-	printf("list_index_del failed\n");
+    printf("list_index_del failed\n");
 }
 
 int main(void)
 {
     int ret = 0;
     List *list = list_create();
-	if(list == NULL)
-		return -1;
-	
-	list_head_add(list, 6);
-	list_head_add(list, 7);
-	list_head_add(list, 4);
+    if(list == NULL)
+	return -1;
+
+    list_head_add(list, 6);
+    list_head_add(list, 7);
+    list_head_add(list, 4);
 
     list_tail_add(list, 5);
     list_tail_add(list, 3);
     list_tail_add(list, 2);
-	list_index_add(list, 0, 1);
+    list_index_add(list, 0, 1);
     list_index_add(list, 1, 2);
     list_show(list);
 	
-	list_index_del(list, 0);
+    list_index_del(list, 0);
     list_show(list);
-	list_index_del(list, 6);
+    list_index_del(list, 6);
     list_show(list);
-	list_index_del(list, 1);
+    list_index_del(list, 1);
     list_show(list);
 
 #if 1
-	list_destroy_by_level2_pointer(&list);
+    list_destroy_by_level2_pointer(&list);
     list_show(list);
 #else /* or */
-	list_destroy_by_level1_pointer(list);
-	if(list!=NULL) {
-		free(list);
-		list = NULL;
-	}
+    list_destroy_by_level1_pointer(list);
+    if(list!=NULL) {
+	free(list);
+	list = NULL;
+    }
     list_show(list);
 #endif
 

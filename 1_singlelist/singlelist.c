@@ -263,16 +263,19 @@ void list_index_del(List *list, int index)
 
     cur = list->head;	
     if(index == 0) {
-        list->head = list->head->next; 
-        node_free_by_level1_pointer(cur);
+		cur = cur->next;
+//        node_free_by_level1_pointer(list->head);
+	    node_free_by_level2_pointer(&(list->head));
+        list->head = cur; 
         return;
     }
 			
     while(cur) {
-	if(index == count) {
+	    if(index == count) {
             pre->next = cur->next;
-	    node_free_by_level1_pointer(cur);
-	    return;
+//    	    node_free_by_level1_pointer(cur);
+            node_free_by_level2_pointer(&cur);
+    	    return;
 	}
 	pre = cur;
 	cur = cur->next;

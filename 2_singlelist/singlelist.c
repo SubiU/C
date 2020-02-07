@@ -37,11 +37,11 @@ void list_destroy(NODE **head)
     NODE *cur = NULL;
 	if(head!=NULL && *head!=NULL) {
         cur = *head;
-		while(*head) {
+		while(cur) {
             cur = cur->next;
 			node_free(head);
 		    *head = cur;
-		}
+		}		
 	}
 }
 

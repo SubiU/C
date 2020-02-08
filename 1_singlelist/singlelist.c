@@ -53,7 +53,7 @@ void list_destroy_by_level2_pointer(List **list)
         while(cur)
         {
             p = cur->next;
-            node_free(&cur); /* 释放了链表成员,但没有将其置为NULL,只是将cur置为NULL */
+            node_free_by_level2_pointer(&cur); /* 释放了链表成员,但没有将成员指针置为NULL,只是将cur置为NULL */
     	    cur = p;
     	}
 	list_show(*list);    /* 此时访问链表成员会访问到随机值 */
@@ -64,9 +64,9 @@ void list_destroy_by_level2_pointer(List **list)
 #else /* 改进 */
 void node_free_by_level2_pointer(Node **node)
 {
-    if(node!=NULL && *node!=NULL) {
+    if(node!=NULL && *node!=NULL) {	
         free(*node);
-	*node = NULL;
+	    *node = NULL;
     }
 }
 void list_destroy_by_level2_pointer(List **list)
@@ -80,8 +80,8 @@ void list_destroy_by_level2_pointer(List **list)
             node_free_by_level2_pointer(&((*list)->head));
     	    (*list)->head = cur;
     	}
-	free(*list);
-	*list = NULL;
+        free(*list);
+    	*list = NULL;
     }  
 }
 #endif

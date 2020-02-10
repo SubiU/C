@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef DEF_FUNC
 #define DEF_FUNC(x) 0x01
-#endif
+#define DEF_FUNC_CANCEL(x) 0x00
+
+#define OUTPUT 0	
+#define printf_f(x) { if(OUTPUT) { printf("[%s:%d]: ",__func__,__LINE__); printf x;} }
 
 typedef struct Node_t{
     int val;
@@ -27,7 +29,7 @@ void list_show(List *list)
 
     Node *cur = list->head;
 	while(cur) {
-            printf("%d ",cur->val);
+            printf("%d(%p) ",cur->val,cur);
 	    cur = cur->next;
 	}
 	
@@ -83,7 +85,9 @@ void list_destroy_by_level2_pointer(List **list)
     }  
 }
 #endif
+#endif
 
+#if DEF_FUNC("LeetCode_19. 删除链表的倒数第n个节点(一次遍历)")
 #if 1
 void list_remove_nth_from_end(List *list, int n)
 {
@@ -361,6 +365,36 @@ void list_index_del(List *list, int index)
     printf("list_index_del failed\n");
 }
 
+void list_reverse_iteration(List *list)
+{
+	Node *cur = NULL;
+	Node *next = NULL;
+    if(list==NULL)
+		return;
+
+	cur = list->head->next;
+	list->head->next = NULL;
+	while(cur) {
+		next = cur->next;
+		cur->next = list->head;
+		list->head = cur;
+		cur = next;
+	}
+}
+
+Node* list_reverse_recursive(Node *head)
+{
+	Node *headNew = NULL;
+
+	if(head==NULL || head->next==NULL)  /* 1 2 4 7 6 5 3 2 */
+		return head;
+	headNew = list_reverse_recursive(head->next);
+	head->next->next = head;
+	head->next = NULL;
+	
+	return headNew;
+}
+
 int main(void)
 {
     int ret = 0;
@@ -377,8 +411,9 @@ int main(void)
     list_tail_add(list, 2);
     list_index_add(list, 0, 1);
     list_index_add(list, 1, 2);
-    list_show(list);
-	
+    list_show(list);   /* 1 2 4 7 6 5 3 2 */
+
+#if DEF_FUNC_CANCEL("删除链表的倒数第n个节点")	
     list_index_del(list, 0);
     list_show(list);
 	list_remove_nth_from_end(list, 4);
@@ -398,6 +433,16 @@ int main(void)
 	list = NULL;
     }
     list_show(list);
+#endif
+#endif
+
+#if DEF_FUNC("链表反转")	
+    list_reverse_iteration(list);
+	list_show(list);
+	list->head = list_reverse_recursive(list->head);
+    list_show(list);
+
+    list_destroy_by_level2_pointer(&list);
 #endif
 
     return 0;

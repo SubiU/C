@@ -1,11 +1,16 @@
 /*****************************************************************   
-** Function :  单链表的增删改查
-** Author   :  SubiU
-** Date     :  2020.02.04
+** Function :  单链表的增删改查.
+**             反转链表.
 ******************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define DEF_FUNC(x) 0x01
+#define DEF_FUNC_CANCEL(x) 0x00
+
+#define OUTPUT 1
+#define printf_f(x) { if(OUTPUT) { printf("[%s:%d]: ",__func__,__LINE__); printf x;} }
 
 typedef struct node_t {
     int val;
@@ -175,6 +180,55 @@ int link_delete_at_index(NODE **head, int index)
 	return 0;
 }
 
+#if 1
+void list_reverse_iteration(NODE **head)  /* 反转链表(迭代法) */
+{
+	NODE *cur = NULL;
+	NODE *next = NULL;
+    if(head==NULL || *head==NULL)
+		return;
+
+	cur = (*head)->next;
+	(*head)->next = NULL;
+	while(cur) {
+		next = cur->next;
+		cur->next = (*head);
+		*head = cur;
+		cur = next;
+	}
+}
+#else /* or */
+NODE* list_reverse_iteration(NODE *head)  /* 反转链表(迭代法) */
+{
+	NODE *cur = NULL;
+	NODE *next = NULL;
+    if(head==NULL)
+		return head;
+	cur = head->next;
+	head->next = NULL;
+	while(cur) {
+		next = cur->next;
+		cur->next = head;
+		head = cur;
+		cur = next;
+	}
+	return head;
+}
+#endif
+
+NODE* list_reverse_recursive(NODE *head) /* 反转链表(递归法) */
+{
+	NODE *headNew = NULL;
+
+	if(head==NULL || head->next==NULL)
+		return head;
+	headNew = list_reverse_recursive(head->next);	
+	head->next->next = head;
+	head->next = NULL;
+	
+	return headNew;
+}
+
 void list_show(NODE *head)
 {
     NODE *cur = NULL;
@@ -211,9 +265,17 @@ int main(void)
     link_add_at_index(&head, 5, 0);
     link_head_add(&head, 6);
 	list_show(head);        /* 6 4 6 1 2 0 0 4 */
+
+#if DEF_FUNC("反转链表")
+	head = list_reverse_recursive(head);
+	list_show(head);
+//	head = list_reverse_iteration(head);
+	list_reverse_iteration(&head);
+	list_show(head);
 	
 	list_destroy(&head);
 	list_show(head);
+#endif
 
     return 0;
 }

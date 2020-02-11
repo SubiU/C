@@ -1,6 +1,7 @@
 /*****************************************************************   
-** Function :  LeetCode_19. 删除链表的倒数第n个节点(一次遍历).
-**             反转链表.
+** Function :  单向链表操作 
+**             删除链表的倒数第n个节点(一次遍历).
+**             反转链表、奇偶链表、回文链表
 ******************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +36,8 @@ void list_show(List *list)
 
     Node *cur = list->head;
 	while(cur) {
-            printf("%d(%p) ",cur->val,cur);
+		printf("%d ",cur->val);
+//      printf("%d(%p) ",cur->val,cur);
 	    cur = cur->next;
 	}
 	
@@ -327,7 +329,7 @@ short list_index_add(List *list, int index, int val)
 	count++;
     }
 
-    if(count+1 == index) {
+    if(count == index) {
         list_tail_add(list, val);
         return 0;
     }

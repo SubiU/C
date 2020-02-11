@@ -1,25 +1,17 @@
 /*****************************************************************   
-** Function :  单向链表操作 
-**             删除链表的倒数第n个节点(一次遍历).
-**             反转链表、奇偶链表、回文链表
+** Function :  双向链表的增删改查
 ******************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef DEF_FUNC
 #define DEF_FUNC(x) 0x01
-#define DEF_FUNC_CANCEL(x) 0x00
-
-#define OUTPUT 0	
-#define printf_f(x) { if(OUTPUT) { printf("[%s:%d]: ",__func__,__LINE__); printf x;} }
-
-enum {
-	FALSE = 0,
-	TRUE =1
-};
+#endif
 
 typedef struct Node_t{
     int val;
+    struct Node_t *prev;
     struct Node_t *next;
 }Node;
 
@@ -36,8 +28,7 @@ void list_show(List *list)
 
     Node *cur = list->head;
 	while(cur) {
-		printf("%d ",cur->val);
-//      printf("%d(%p) ",cur->val,cur);
+            printf("%d(%p) ",cur->val,cur);
 	    cur = cur->next;
 	}
 	
@@ -91,86 +82,6 @@ void list_destroy_by_level2_pointer(List **list)
         free(*list);
     	*list = NULL;
     }  
-}
-#endif
-#endif
-
-#if DEF_FUNC("LeetCode_19. 删除链表的倒数第n个节点(一次遍历)")
-#if 1
-void list_remove_nth_from_end(List *list, int n)
-{
-	Node *cur = NULL;
-	Node *p = NULL;
-	Node *pre = NULL;
-	
-	if(list==NULL)
-		return;
-	
-	printf("list remove %dth-node from end:\n",n);
-	cur = p = pre = list->head;
-	while(n>0) {
-		cur = cur->next;
-	    n--;
-	}
-
-	while(cur) {
-		pre = p;
-		p = p->next;
-    	cur = cur->next;
-	}
-	if(p!=NULL) {
-		if(p==list->head) {
-            cur = p->next;
-			node_free_by_level2_pointer(&(list->head));
-		    list->head = cur;
-		}else {
-    		pre->next = p->next;
-    	    node_free_by_level2_pointer(&p);
-		}
-	}else {
-		printf("list_remove_nth_from_end failed.\n");
-	}
-}
-#else  /* 使用虚拟链表头节点 */
-void list_remove_nth_from_end(List *list, int n)
-{
-	Node *cur = NULL;
-	Node *p = NULL;
-	Node *pre = NULL;
-	Node *virtualHead = NULL;
-	
-	if(list==NULL)
-		return;
-	
-	printf("list remove %dth-node from end:\n",n);
-	virtualHead = (Node *)malloc(sizeof(Node));
-	if(virtualHead==NULL)
-		return;
-	memset(virtualHead, 0, sizeof(Node));
-	virtualHead->next = list->head;
-	list->head = virtualHead;
-	
-	cur = p = pre = list->head;
-	while(n>0) {
-		cur = cur->next;
-	    n--;
-	}
-
-	while(cur) {
-		pre = p;
-		p = p->next;
-    	cur = cur->next;
-	}
-	if(p!=NULL) {
-		pre->next = p->next;
-	    node_free_by_level2_pointer(&p);
-	}else {
-		printf("list_remove_nth_from_end failed.\n");
-	}
-
-	cur = list->head->next;
-	free(list->head);
-	list->head = cur;
 }
 #endif
 
@@ -255,7 +166,8 @@ Node *node_create(int val)
     node = (Node *)malloc(sizeof(Node));
     if(node) {
         node->val = val;
-	node->next = NULL;
+		node->prev = NULL;
+		node->next = NULL;
     }
 	
     return node;
@@ -272,59 +184,63 @@ void list_head_add(List *list, int val)
     if(head==NULL)
         return;
 
-    head->next = list->head;
-    list->head = head;
+    if(list->head!=NULL) {
+	    head->next = list->head;
+		list->head->prev = head;
+	    list->head = head;
+    }else {
+		list->head = head;
+	}
 }
 
 void list_tail_add(List *list, int val)
 {
     Node *tail = NULL;
-    Node *pre = list->head;
-    Node *cur = list->head;
+    Node *cur = NULL;
 	
     if(list==NULL)
         return;
+    cur = list->head;
 
     tail = node_create(val);
     if(tail==NULL)
-	return;
+		return;
 
-    while(cur) {
-        pre = cur;
-	cur = cur->next;
-    }
+    while(cur->next)
+		cur = cur->next;
     
-    if(pre)
-        pre->next = tail;
-    else
-        list->head = tail;
+    cur->next = tail;
+    tail->prev = cur;
 }
 
 short list_index_add(List *list, int index, int val)
 {
     Node *node = NULL;
     Node *pre = NULL;
-    Node *cur = list->head;
+    Node *cur = NULL;
     int count = 0;
 	
     if(list==NULL)
         return -1;
+    cur = list->head;
 
     if(index == 0) {
         list_head_add(list, val);
-	return 0;
-     }
+		return 0;
+    }
 			
     while(cur) {
 	if(index == count) {
 	    node = node_create(val);
 	    if(node==NULL)
-		return -1;
-	    node->next = cur;
-	    pre->next = node;
+			return -1;
+		node->prev = cur->prev;
+		node->next = cur;
+		cur->prev->next = node;
+		cur->prev = node;
+
 	    return 0;
 	}
-        pre = cur;
 	cur = cur->next;
 	count++;
     }
@@ -342,7 +258,6 @@ short list_index_add(List *list, int index, int val)
 void list_index_del(List *list, int index)
 {
     Node *node = NULL;
-    Node *pre = NULL;
     Node *cur = NULL;
     int count = 0;
 
@@ -354,111 +269,46 @@ void list_index_del(List *list, int index)
 		cur = cur->next;
 //        node_free_by_level1_pointer(list->head);
 	    node_free_by_level2_pointer(&(list->head));
+		cur->prev = NULL;
         list->head = cur; 
         return;
     }
 			
     while(cur) {
 	    if(index == count) {
-            pre->next = cur->next;
+			if(cur->next != NULL) {
+				cur->prev->next = cur->next;
+	            cur->next->prev = cur->prev;
+			}else {
+				cur->prev->next = NULL;
+			}				
 //    	    node_free_by_level1_pointer(cur);
             node_free_by_level2_pointer(&cur);
     	    return;
-	}
-	pre = cur;
-	cur = cur->next;
-	count++;
+		}
+		cur = cur->next;
+		count++;		
     }
 
     printf("list_index_del failed\n");
 }
 
-void list_reverse_iteration(List *list)
-{
-	Node *cur = NULL;
-	Node *next = NULL;
-    if(list==NULL)
-		return;
-
-	cur = list->head->next;
-	list->head->next = NULL;
-	while(cur) {
-		next = cur->next;
-		cur->next = list->head;
-		list->head = cur;
-		cur = next;
-	}
-}
-
-Node* list_reverse_recursive(Node *head)
-{
-	Node *headNew = NULL;
-
-	if(head==NULL || head->next==NULL)
-		return head;
-	headNew = list_reverse_recursive(head->next);
-	head->next->next = head;
-	head->next = NULL;
-	
-	return headNew;
-}
-
-Node* list_odd_even(Node* head)
-{
-    Node *cur = NULL, *p = NULL, *q = NULL;
+int list_get_by_index(List* list, int index) {
+    Node *cur = NULL;
+    int count = 0;
+    if(list == NULL)
+        return -1;
     
-    if(head==NULL)
-        return NULL;
-    cur = p = q = head;
-    while(p && p->next && p->next->next) {
-        p = p->next;
-        q = p->next;
-        p->next = q->next;
-        q->next = cur->next;
-        cur->next = q;
-        cur = q;
+    cur = list->head;
+    while(cur)
+    {
+        if(count == index)
+            return cur->val;
+        cur = cur->next;
+        count++;
     }
-    return head;
-}
 
-int list_is_palindrome(List *list)
-{
-	Node *cur = NULL;
-	Node *headNew = NULL;
-	int count = 0, median = 0, index = 0;
-	if(list==NULL || list->head==NULL || list->head->next==NULL)
-		return TRUE;
-	cur = list->head;
-	while(cur) {
-		cur = cur->next;
-		count++;
-	}
-    median = count/2+count%2-1;
-	if(count%2)
-		median -= 1;
-	cur = list->head;
-	while(cur) {
-		if(index==median) {
-			if(count%2)
-				headNew = cur->next->next;
-			else
-				headNew = cur->next;
-			cur->next = NULL;
-			break;
-		}
-		cur = cur->next;
-		index++;
-	}	
-	headNew = list_reverse_recursive(headNew);
-	cur = list->head;	
-	while(cur && headNew) {
-		if(cur->val != headNew->val)
-			return FALSE;
-		cur = cur->next;
-		headNew = headNew->next;
-	}
-
-	return TRUE;
+    return -1;
 }
 
 int main(void)
@@ -468,57 +318,37 @@ int main(void)
     if(list == NULL)
 	return -1;
 
-    list_head_add(list, 7);
+    list_head_add(list, 6);
     list_head_add(list, 7);
     list_head_add(list, 4);
+    list_show(list);        /* 4 7 6 */
 
-    list_tail_add(list, 4);
+    list_tail_add(list, 5);
+    list_tail_add(list, 3);
     list_tail_add(list, 2);
-    list_tail_add(list, 1);
     list_index_add(list, 0, 1);
-    list_index_add(list, 1, 2);                   
-    list_show(list);   /* 1 2 4 7 7 4 2  */
-
-#if DEF_FUNC_CANCEL("删除链表的倒数第n个节点")	
+    list_index_add(list, 1, 2);
+    list_show(list);         /* 1 2 4 7 6 5 3 2 */
+	
     list_index_del(list, 0);
-    list_show(list);
-	list_remove_nth_from_end(list, 4);
-    list_show(list);
-	list_remove_nth_from_end(list, 6);
-    list_show(list);
-	list_remove_nth_from_end(list, 1);
-    list_show(list);
-#endif
-
-#if DEF_FUNC_CANCEL("链表反转")	
-    list_reverse_iteration(list);
-	list_show(list);
-	list->head = list_reverse_recursive(list->head);
-    list_show(list);
-#endif
-
-#if DEF_FUNC_CANCEL("奇偶链表")
-    list->head = list_odd_even(list->head);
-    list_show(list);
-#endif
-
-#if DEF_FUNC("回文链表")
-	ret = list_is_palindrome(list);
-	if(ret==FALSE)
-		printf("The list is not palindrome.\n");
-	else
-		printf("The list is palindrome.\n");
-#endif
+    list_show(list);         /* 2 4 7 6 5 3 2 */
+    list_index_del(list, 6);
+    list_show(list);         /* 2 4 7 6 5 3 */
+    list_index_del(list, 1); 
+    list_show(list);         /* 2 7 6 5 3 */
+    list_index_add(list, 5, 5);
+    list_show(list);         /* 2 7 6 5 3 5 */
 
 #if 1
-	list_destroy_by_level2_pointer(&list);
+    list_destroy_by_level2_pointer(&list);
+    list_show(list);
 #else /* or */
-	list_destroy_by_level1_pointer(list);
-	if(list!=NULL) {
+    list_destroy_by_level1_pointer(list);
+    if(list!=NULL) {
 	free(list);
 	list = NULL;
-	}
-	list_show(list);
+    }
+    list_show(list);
 #endif
 
     return 0;

@@ -120,8 +120,10 @@ int link_add_at_index(NODE **head, int index, int val)
 	if(head==NULL || *head==NULL)
 		return -1;
 
-	if(index == 0)
+	if(index == 0) {
 		link_head_add(head, val);
+		return 0;
+	}
 	else{
 		cur = *head;
         while(cur) {

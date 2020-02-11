@@ -461,6 +461,46 @@ int list_is_palindrome(List *list)
 	return TRUE;
 }
 
+List* merge_two_list(List *l1, List *l2)
+{
+	Node *pre = NULL;
+	Node *next = NULL;
+	Node *head1 = NULL;
+	Node *head2 = NULL;
+
+	if(l1==NULL && l2==NULL)
+		return NULL;
+    if(l1==NULL && l2!=NULL)
+		return l2;
+	else if(l1!=NULL && l2==NULL)
+		return l1;
+	else if(l1==NULL && l2==NULL)
+		return NULL;
+
+	pre = head1 = l1->head;
+	head2 = l2->head;
+
+	while(head1 && head2) {
+		if(head1->val > head2->val) {
+			next = head2->next;
+			head2->next = head1;
+			if(head1 == l1->head)
+				l1->head = head2;
+			else
+				pre->next = head2;
+			pre = head2;
+			head2 = next;
+		}else {
+			pre = head1;
+			head1 = head1->next;
+		}
+	}
+	if(head1==NULL && head2!=NULL)
+		pre->next = head2;
+
+    return l1;
+}
+
 int main(void)
 {
     int ret = 0;
@@ -502,13 +542,44 @@ int main(void)
     list_show(list);
 #endif
 
-#if DEF_FUNC("回文链表")
+#if DEF_FUNC_CANCEL("回文链表")
 	ret = list_is_palindrome(list);
 	if(ret==FALSE)
 		printf("The list is not palindrome.\n");
 	else
 		printf("The list is palindrome.\n");
 #endif
+
+#if DEF_FUNC("合并两个有序链表")
+	List *list1 = list_create();
+	if(list1 == NULL)
+		return -1;
+	List *list2 = list_create();
+	if(list2 == NULL)
+		return -1;
+
+	list_index_add(list1, 0, 1);
+	list_index_add(list1, 1, 2); 
+	list_index_add(list1, 2, 4);
+	list_index_add(list1, 3, 8);	
+	list_index_add(list1, 4, 9);
+	list_index_add(list1, 5, 20);  				  
+	list_show(list1);
+
+	list_index_add(list2, 0, 1);
+	list_index_add(list2, 1, 3); 
+	list_index_add(list2, 2, 4);
+	list_index_add(list2, 3, 10);	
+	list_index_add(list2, 4, 11);
+	list_show(list2);
+
+	list1 = merge_two_list(list1, list2);
+	list_show(list1);
+
+	list_destroy_by_level2_pointer(&list1);
+	list_destroy_by_level2_pointer(&list2);
+#endif
+
 
 #if 1
 	list_destroy_by_level2_pointer(&list);

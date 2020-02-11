@@ -29,7 +29,8 @@ void list_show(List *list)
 
     Node *cur = list->head;
 	while(cur) {
-            printf("%d(%p) ",cur->val,cur);
+		printf("%d ",cur->val);
+//            printf("%d(%p) ",cur->val,cur);
 	    cur = cur->next;
 	}
 	
@@ -241,7 +242,7 @@ short list_index_add(List *list, int index, int val)
 	count++;
     }
 
-    if(count+1 == index) {
+    if(count == index) {
         list_tail_add(list, val);
         return 0;
     }
@@ -301,14 +302,18 @@ int main(void)
     list_tail_add(list, 2);
     list_index_add(list, 0, 1);
     list_index_add(list, 1, 2);
-    list_show(list);
+    list_show(list);         /* 1 2 4 7 6 5 3 2 */
+    list_index_add(list, 7, 7);
+    list_show(list);         /* 1 2 4 7 6 5 3 7 2 */
+    list_index_add(list, 9, 9);
+    list_show(list);         /* 1 2 4 7 6 5 3 7 2 9 */
 	
-    list_index_del(list, 0);
-    list_show(list);
-    list_index_del(list, 6);
-    list_show(list);
-    list_index_del(list, 1);
-    list_show(list);
+    list_index_del(list, 0); 
+    list_show(list);    	 /* 2 4 7 6 5 3 7 2 9 */
+    list_index_del(list, 6); 
+    list_show(list);         /* 2 4 7 6 5 3 2 9 */
+    list_index_del(list, 1); 
+    list_show(list);         /* 2 7 6 5 3 2 9 */
 
 #if 1
     list_destroy_by_level2_pointer(&list);

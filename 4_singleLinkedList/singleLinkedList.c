@@ -501,6 +501,71 @@ List* merge_two_list(List *l1, List *l2)
     return l1;
 }
 
+Node* two_list_numbers_add(List *list1, List *list2)
+{
+    Node *head1 = NULL;
+	Node *head2 = NULL;
+	Node *node = NULL;
+	Node *pre = NULL;
+	Node *cur = NULL;
+	int carry = 0, val = 0;
+	if(list1==NULL || list2==NULL)
+		return NULL;
+    else if(list1->head!=NULL && list2->head==NULL)
+        return list1->head;
+    else if(list1->head==NULL && list2->head!=NULL)
+        return list2->head;
+
+	head1 = list1->head;
+	head2 = list2->head;
+
+    while(head1 && head2) {
+		head1 = head1->next;
+		head2 = head2->next;
+	}
+	if(head1!=NULL) {
+		head1 = list1->head;
+		head2 = list2->head;
+	}
+	else {
+		head1 = list2->head;
+		head2 = list1->head;
+	}
+	
+	cur = head1;
+	while(head1 && head2) {
+		val = head1->val+head2->val+carry;
+		carry = 0;
+		if(val>=10) {
+			carry = 1;
+			val -=10;
+		}
+		head1->val = val;
+		pre = head1;
+		head1 = head1->next;
+		head2 = head2->next;
+	}
+	while(head1) {
+		val = head1->val+carry;
+		carry = 0;
+		if(val>=10) {
+			carry = 1;
+			val -=10;
+		}
+		head1->val = val;
+		pre = head1;
+		head1 = head1->next;
+	}
+	if(carry==1) {
+		node = node_create(1);
+		if(node==NULL)
+			return NULL;
+		if(pre!=NULL)
+			pre->next = node;
+	}
+	return cur;
+}
+
 int main(void)
 {
     int ret = 0;
@@ -550,7 +615,7 @@ int main(void)
 		printf("The list is palindrome.\n");
 #endif
 
-#if DEF_FUNC("合并两个有序链表")
+#if DEF_FUNC_CANCEL("合并两个有序链表")
 	List *list1 = list_create();
 	if(list1 == NULL)
 		return -1;
@@ -580,6 +645,39 @@ int main(void)
 	list_destroy_by_level2_pointer(&list2);
 #endif
 
+#if DEF_FUNC("两数相加")
+	List *list1 = list_create();
+	if(list1 == NULL)
+		return -1;
+	List *list2 = list_create();
+	if(list2 == NULL)
+		return -1;
+
+	list_index_add(list1, 0, 1);
+#if 0	
+	list_index_add(list1, 1, 2); 
+	list_index_add(list1, 2, 4);
+	list_index_add(list1, 3, 8);	
+	list_index_add(list1, 4, 7);
+	list_index_add(list1, 5, 9);
+#endif
+	list_show(list1);
+
+	list_index_add(list2, 0, 9);
+	list_index_add(list2, 1, 9);
+#if 0	
+	list_index_add(list2, 2, 4);
+	list_index_add(list2, 3, 8);	
+	list_index_add(list2, 4, 9);
+#endif
+	list_show(list2);
+
+	list1->head = two_list_numbers_add(list1, list2);
+	list_show(list1);
+
+	list_destroy_by_level2_pointer(&list1);
+	list_destroy_by_level2_pointer(&list2);
+#endif
 
 #if 1
 	list_destroy_by_level2_pointer(&list);

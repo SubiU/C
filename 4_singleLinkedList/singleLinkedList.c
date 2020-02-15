@@ -1,7 +1,7 @@
 /*****************************************************************   
 ** Function :  单向链表操作 
 **             删除链表的倒数第n个节点(一次遍历).
-**             反转链表、奇偶链表、回文链表
+**             反转链表、奇偶链表、回文链表、旋转链表
 ******************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -564,6 +564,41 @@ Node* two_list_numbers_add(List *list1, List *list2)
 	return cur;
 }
 
+Node* list_rotate_right(Node *head, int k)
+{
+    Node *cur = NULL;
+    Node *pre = NULL;
+    Node *tmp = NULL;
+    int count = 0, index = 0;
+    if(head==NULL || k==0)
+        return head;
+    cur = head;
+    while(cur->next) {
+        cur = cur->next;
+        count++;
+    }
+    count += 1;
+    if(k%count==0)
+        return head;
+    index = count-(k%count)-1;
+    count = 0;
+    cur = head;
+    while(cur) {
+        if(count==index) {
+            tmp = cur;
+        }
+        pre = cur;
+        cur = cur->next;
+        count++;
+    }
+    if(tmp!=NULL) {   
+        pre->next = head;
+        head = tmp->next;
+        tmp->next = NULL;
+    }
+    return head;	
+}
+
 int main(void)
 {
     int ret = 0;
@@ -643,7 +678,7 @@ int main(void)
 	list_destroy_by_level2_pointer(&list2);
 #endif
 
-#if DEF_FUNC("两数相加")
+#if DEF_FUNC_CANCEL("两数相加")
 	List *list1 = list_create();
 	if(list1 == NULL)
 		return -1;
@@ -676,6 +711,19 @@ int main(void)
 	list_destroy_by_level2_pointer(&list1);
 	list_destroy_by_level2_pointer(&list2);
 #endif
+
+#if DEF_FUNC("旋转链表")
+	list->head = list_rotate_right(list->head,2);
+    printf("list rorate righe 2 nodes:\n");
+	list_show(list);
+	list->head = list_rotate_right(list->head,2);
+    printf("list rorate righe 2 nodes:\n");
+	list_show(list);
+	list->head = list_rotate_right(list->head,8);
+    printf("list rorate righe 8 nodes:\n");
+	list_show(list);
+#endif
+
 
 #if 1
 	list_destroy_by_level2_pointer(&list);

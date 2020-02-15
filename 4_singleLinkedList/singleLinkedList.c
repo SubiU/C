@@ -470,12 +470,10 @@ List* merge_two_list(List *l1, List *l2)
 
 	if(l1==NULL && l2==NULL)
 		return NULL;
-    if(l1==NULL && l2!=NULL)
+    else if(l1==NULL && l2!=NULL)
 		return l2;
 	else if(l1!=NULL && l2==NULL)
 		return l1;
-	else if(l1==NULL && l2==NULL)
-		return NULL;
 
 	pre = head1 = l1->head;
 	head2 = l2->head;

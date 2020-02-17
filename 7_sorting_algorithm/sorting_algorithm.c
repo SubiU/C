@@ -1,11 +1,13 @@
 /*****************************************************************   
 ** Function : 排序算法. 
-**            冒泡排序、
+**            冒泡排序、选择排序、插入排序、希尔排序
+**            归并排序、快速排序
 ******************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define DEF_FUNC(x) 0x01
 #define DEF_FUNC_CANCEL(x) 0x00
@@ -200,12 +202,86 @@ void merge_sort(int *array, int start, int end)
 	merge(array, start, median, median+1, end);
 }
 
+void insert(int *array, int gap, int index)
+{
+    int i = 0;
+	int inserted = array[index];
+	
+	printf_f(("gap(%d) index(%d)\n",gap,index));
+	
+    for(i=index-gap; i>=0&&(inserted<array[i]); i-=gap) {
+		printf_f(("i(%d) \n",i))
+        array[i+gap] = array[i];
+    }
+	printf_f(("i(%d) \n",i))
+    array[i+gap] = inserted;
+}
+
+void shell_sort(int *array, int len)
+{
+    int  i = 0;
+	int gap = 0;
+	
+    for(gap=len/2; gap>0; gap/=2) {
+        for(i=gap; i<len; i++) {
+            insert(array, gap, i);
+		}
+	}
+}
+
+int partition(int *array, int start, int end)
+{
+	int i = start, j = start;
+	int val = array[end];
+	
+	if(array==NULL)
+		return -1;
+	
+#if 1
+    for(j=start; j<end; j++) {
+		if(array[j]<val) {
+			swap(array, i, j);
+			i++;
+		}
+    }
+#else	
+	while(i<end && j<end) {
+		if(array[j]>val) {
+			j++;
+		}else {
+			swap(array, i, j);
+			i++;
+			j++;
+		}
+	}
+#endif
+	swap(array, i, end);
+
+	return i;
+}
+
+void quick_sort(int *array, int start, int end)
+{
+	int point = 0;
+	if(array==NULL)
+		return;
+
+	if(start>=end)
+		return;
+
+    point = partition(array, start, end);
+	if(point==-1)
+		return;
+	quick_sort(array, start, point-1);
+	quick_sort(array, point+1, end);
+}
+
 int main(void)
 {
 	int array[SIZE] = {0};
 	int i = 0;
 	for(i=0; i<SIZE; i++)
-		array[i] = rand()%SIZE+1;
+		array[i] = rand()%100+1;
 
 	printf("array: ");
 	array_show(array, SIZE);
@@ -236,66 +312,26 @@ int main(void)
 	array_show(array, SIZE);
 #endif
 
-#if DEF_FUNC("merge_sort")
+#if DEF_FUNC_CANCEL("merge_sort")
 	merge_sort(array, 0, SIZE-1);
 
 	printf("merge sort: ");
 	array_show(array, SIZE);
 #endif
 
+#if DEF_FUNC_CANCEL("shell_sort")
+	shell_sort(array, SIZE);
+
+	printf("shell sort: ");
+	array_show(array, SIZE);
+#endif
+
+#if DEF_FUNC("quick_sort")
+	quick_sort(array, 0, SIZE-1);
+
+	printf("quick sort: ");
+	array_show(array, SIZE);
+#endif
 
 	return 0;
 }
-
-#if 0
-
-#include <stdio.h>
-/* 希尔排序 */
-void nums_show(int *array, int len)
-{
-    int i = 0;
-	
-	for(i=0; i<len; i++)
-	{
-		printf("%d\t",array[i]);
-	}
-	printf("\r\n\r\n");
-}
-
-void insert_sort(int *array, int gap, int index)
-{
-    int i = 0;
-	int inserted = array[index];
-		
-    for(i=index-gap; i>=0&&(inserted<array[i]); i-=gap) {
-        array[i+gap] = array[i];
-    }
-    array[i+gap] = inserted;
-}
-
-void shell_sort(int *array, int len)
-{
-    int  i = 0;
-	int gap = 0;
-	
-    for(gap=len/2; gap>0; gap/=2) {
-        for(i=gap; i<len; i++) {
-            insert_sort(array, gap, i);
-		}
-	}
-}
-
-int main(void)
-{
-    int i = 0;
-    int a[10] = {8, 9, 1, 7, 2, 3, 5, 4, 6, 0};
-
-	printf("The nums: \r\n");
-	nums_show(a, 10);
-
-    shell_sort(a, 10);
-
-    printf("in order: \r\n");
-	nums_show(a, 10);
-}
-#endif

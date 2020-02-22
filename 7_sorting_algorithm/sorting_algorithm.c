@@ -1,7 +1,11 @@
 /*****************************************************************   
-** Function : 排序算法. 
+** Function : 
+**			  排序算法
 **            冒泡排序、选择排序、插入排序、希尔排序
 **            归并排序、快速排序
+**
+** 			  查找算法
+**			  二分查找
 ******************************************************************/
 
 #include <stdio.h>
@@ -276,6 +280,42 @@ void quick_sort(int *array, int start, int end)
 	quick_sort(array, point+1, end);
 }
 
+int binary_search(int *array, int size, int value)
+{
+    int median = 0;
+	int start = 0, end = size-1;
+	if(array==NULL || size<0)
+		return -1;
+
+	while(start<=end) {
+		median = start+((end-start)>>1); /* start+(end-start)/2 */
+		printf("median: %d\n",median);
+		if(array[median]==value) 
+			return median;
+		if(array[median]<value)
+			start = median+1;
+		else
+			end = median-1;
+	}
+	return -1;
+}
+
+int binary_search_recursive(int * array, int start, int end, int value)
+{
+	int median = 0;
+	if(array==NULL)
+		return -1;
+	if(start>end)
+		return -1;
+	median = start+((end-start)>>1);
+	if(array[median] == value)
+		return median;
+	else if(array[median]<value)
+		return binary_search_recursive(array, median+1, end, value);
+	else 
+		return binary_search_recursive(array, start, median-1, value);
+}
+
 int main(void)
 {
 	int array[SIZE] = {0};
@@ -331,6 +371,13 @@ int main(void)
 
 	printf("quick sort: ");
 	array_show(array, SIZE);
+#endif
+
+#if DEF_FUNC("binary_search")
+//	i = binary_search(array, SIZE, 87);
+	i = binary_search_recursive(array, 0, SIZE-1, 87);
+
+	printf("binary_search: index(%d)\n",i);
 #endif
 
 	return 0;

@@ -292,7 +292,7 @@ int binary_search(int *array, int size, int value)
 		printf("median: %d\n",median);
 		if(array[median]==value) 
 			return median;
-		if(array[median]<value)
+		else if(array[median]<value)
 			start = median+1;
 		else
 			end = median-1;
@@ -314,6 +314,82 @@ int binary_search_recursive(int * array, int start, int end, int value)
 		return binary_search_recursive(array, median+1, end, value);
 	else 
 		return binary_search_recursive(array, start, median-1, value);
+}
+
+int binary_search_first_value(int *array, int size, int value)
+{
+    int median = 0;
+	int start = 0, end = size-1;
+	if(array==NULL || size<0)
+		return -1;
+
+#if 0
+	while(start<=end) {  /* 查找第一个值等于给定值的元素 */
+		median = start+((end-start)>>1); /* 直接使用 (start+end)/2, 如start和end数值太大可能导致数据溢出,优化使用 start+(end-start)/2 */
+		if(array[median]<value)
+			start = median+1;
+		else if(array[median]>value)
+			end = median-1;
+		else {
+			if(median==0 || array[median-1]!=value) 
+				return median;
+			else {
+	 			end = median-1;
+			}
+		}
+	}
+#else     /* 查找第一个值大于等于给定值的元素 */
+	while(start<=end) { 
+		median = start+((end-start)>>1); /* start+(end-start)/2 */
+		if(array[median]>=value) {
+			if(median==0 || array[median-1]<value)
+				return median;
+			else
+				end = median-1;
+		}
+		else
+			start = median+1;
+	}
+#endif
+
+	return -1;
+}
+
+int binary_search_last_value(int *array, int size, int value)
+{
+    int median = 0;
+	int start = 0, end = size-1;
+	if(array==NULL || size<0)
+		return -1;
+
+#if 0    /* 查找最后一个值等于给定值的元素 */
+	while(start<=end) {
+		median = start+((end-start)>>1); /* start+(end-start)/2 */
+		if(array[median]<value)
+			start = median+1;
+		else if(array[median]>value)
+			end = median-1;
+		else {
+			if(median==end || array[median+1]!=value)
+				return median;
+			else
+				start = median+1;
+		}
+	}
+#else   /* 查找最后一个值小于等于给定值的元素 */
+	while(start<=end) {
+		median = start+((end-start)>>1); /* start+(end-start)/2 */
+		if(array[median]<=value) {
+			if(median==end || array[median+1]>value)
+				return median;
+			else
+				start = median+1;
+		}else
+			end = median-1;
+	}
+#endif
+
+	return -1;
 }
 
 int main(void)
@@ -375,8 +451,10 @@ int main(void)
 
 #if DEF_FUNC("binary_search")
 //	i = binary_search(array, SIZE, 87);
-	i = binary_search_recursive(array, 0, SIZE-1, 87);
-
+//	i = binary_search_recursive(array, 0, SIZE-1, 87);
+//	i = binary_search_first_value(array, SIZE, 87);
+	i = binary_search_last_value(array, SIZE, 87);
+	
 	printf("binary_search: index(%d)\n",i);
 #endif
 

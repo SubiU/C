@@ -392,6 +392,71 @@ int binary_search_last_value(int *array, int size, int value)
 	return -1;
 }
 
+void age_sort(int *age, int length)
+{
+	if(age==NULL || length<=0)
+		return;
+	
+	int oldestAge = 99; 
+	int timesofAge[oldestAge+1];
+	int i = 0, j = 0, size = 0;
+
+	for(i=0; i<oldestAge+1; i++)
+		timesofAge[i] = 0;
+	
+	for(i=0; i<length; i++) {
+		if(age[i]<0 || age[i]>oldestAge)
+			continue;
+		++timesofAge[age[i]];
+	}
+
+	for(i=0; i<oldestAge+1; i++) {
+		for(j=0; j<timesofAge[i]; j++) {
+			age[size++] = i;
+		}
+	}
+}
+
+int mininorder(int *arr, int len)
+{
+	if(arr==NULL || len<=0)
+		return -1;
+
+	int i = 0, result = arr[0];
+	for(i=1; i<len; i++) {
+		if(result > arr[i])
+			result = arr[i];
+	}
+	
+	return result;
+}
+
+int min(int *arr, int len)
+{
+	if(arr==NULL || len<=0)
+		return -1;
+	
+	int index1 = 0, index2 = len-1;
+	int mid = index1;
+	while(arr[index1]>=arr[index2]) {
+		mid = (index1+index2)/2;
+		if(index2-index1==1) {
+			mid = index2;
+			break;
+		}
+
+		if(arr[index1]==arr[index2] && arr[mid]==arr[index1])
+			return mininorder(arr,len);
+			
+		if(arr[mid]>=arr[index1])
+			index1 = mid;
+		else if(arr[mid]<=arr[index2])
+			index2 = mid;
+	}
+
+	return arr[mid];
+}
+
 int main(void)
 {
 	int array[SIZE] = {0};
@@ -449,13 +514,41 @@ int main(void)
 	array_show(array, SIZE);
 #endif
 
-#if DEF_FUNC("binary_search")
+#if DEF_FUNC_CANCEL("binary_search")
 //	i = binary_search(array, SIZE, 87);
 //	i = binary_search_recursive(array, 0, SIZE-1, 87);
 //	i = binary_search_first_value(array, SIZE, 87);
 	i = binary_search_last_value(array, SIZE, 87);
 	
 	printf("binary_search: index(%d)\n",i);
+#endif
+
+#if DEF_FUNC("min")
+/*
+旋转数组的最小数字
+// 题目：把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。
+// 输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。例如数组
+// {3, 4, 5, 1, 2}为{1, 2, 3, 4, 5}的一个旋转，该数组的最小值为1。
+*/
+//	int arr[5] = {3, 4, 5, 1, 2};
+	int arr[5] = {1, 2, 3, 4, 5};
+	array_show(arr, 5);
+
+	int value = 0;
+	value = min(arr, 5);
+	printf("min: %d\n", value);
+#endif
+
+#if DEF_FUNC_CANCEL("age sort")
+	int ages[100];
+	int idx = 0;
+	for(idx=0; idx<100; idx++)
+		ages[idx] = rand()%100;
+	printf("ages: \n");
+	array_show(ages, 100);
+	age_sort(ages, 100);
+	printf("ages sort:\n");
+	array_show(ages, 100);
 #endif
 
 	return 0;

@@ -239,6 +239,32 @@ void list_destroy_by_level1_pointer(List *list)
 #endif
 #endif
 
+#if DEF_FUNC("获取链表的倒数第n个节点(一次遍历)")
+Node* node_kth_to_tail(List *list, unsigned int k)
+{
+	if(list==NULL || list->head==NULL || k==0)
+		return NULL;
+	Node *p1 = list->head, *p2 = list->head;
+	unsigned int i = 0;
+	for(i=0; i<k-1; i++) {
+		if(p1->next != NULL) {
+			p1 = p1->next;
+		}
+		else {
+			return NULL;
+		}
+	}
+
+	while(p1->next != NULL) {
+		p1 = p1->next;
+		p2 = p2->next;
+	}
+
+	return p2;
+}
+#endif
+
+
 List *list_create(void)
 {
     List *list = NULL;
@@ -615,15 +641,24 @@ int main(void)
     list_tail_add(list, 1);
     list_index_add(list, 0, 1);
     list_index_add(list, 1, 2);                   
-    list_show(list);   /* 1 2 4 7 7 4 2  */
+    list_show(list);   /* 1 2 4 7 7 4 2 1 */
 
-#if DEF_FUNC_CANCEL("删除链表的倒数第n个节点")	
     list_index_del(list, 0);
     list_show(list);
+	
+#if DEF_FUNC("删除链表的倒数第n个节点")	
+	Node *nodeK = node_kth_to_tail(list, 4);
+	printf("node-kth(4): %d\n", nodeK->val);
 	list_remove_nth_from_end(list, 4);
     list_show(list);
+
+	nodeK = node_kth_to_tail(list, 6);
+	printf("node-kth(6): %d\n", nodeK->val);
 	list_remove_nth_from_end(list, 6);
     list_show(list);
+
+	nodeK = node_kth_to_tail(list, 1);
+	printf("node-kth(1): %d\n", nodeK->val);
 	list_remove_nth_from_end(list, 1);
     list_show(list);
 #endif
@@ -712,7 +747,7 @@ int main(void)
 	list_destroy_by_level2_pointer(&list2);
 #endif
 
-#if DEF_FUNC("旋转链表")
+#if DEF_FUNC_CANCEL("旋转链表")
 	list->head = list_rotate_right(list->head,2);
     printf("list rorate righe 2 nodes:\n");
 	list_show(list);
